@@ -14,6 +14,7 @@ using System.IO;
 using System.Text;
 using Microsoft.SPOT.Net.NetworkInformation;
 using Toolbox.NETMF.Hardware;
+using Netduino.Foundation.Sensors.Atmospheric;
 
 namespace SoilMoisture
 {
@@ -37,6 +38,7 @@ namespace SoilMoisture
             int uploadTries = 0;
             int maxTries = 5;
 
+
             
 
             // Create an output port (a port that can be written to) 
@@ -44,20 +46,27 @@ namespace SoilMoisture
             OutputPort led = new OutputPort(Pins.ONBOARD_LED, false);
 
             //HumiditySensorController sensorFour = new HumiditySensorController(N.Pins.GPIO_PIN_A3, N.Pins.GPIO_PIN_D4);
-            // The Adafruit LCD Shield uses a MCP23017 IC as multiplex chip
-            Mcp23017 Mux = new Mcp23017();
-            // Pins 9 to 15 are connected to the HD44780 LCD
-            Hd44780Lcd Display = new Hd44780Lcd(
-                Data: Mux.CreateParallelOut(9, 4),
-                ClockEnablePin: Mux.Pins[13],
-                ReadWritePin: Mux.Pins[14],
-                RegisterSelectPin: Mux.Pins[15]
-            );
+            //// The Adafruit LCD Shield uses a MCP23017 IC as multiplex chip
+            //Mcp23017 Mux = new Mcp23017();
+            //// Pins 9 to 15 are connected to the HD44780 LCD
+            //Hd44780Lcd Display = new Hd44780Lcd(
+            //    Data: Mux.CreateParallelOut(9, 4),
+            //    ClockEnablePin: Mux.Pins[13],
+            //    ReadWritePin: Mux.Pins[14],
+            //    RegisterSelectPin: Mux.Pins[15]
+            //);
 
             HumiditySensorController sensorOne = new HumiditySensorController(N.Pins.GPIO_PIN_A0, N.Pins.GPIO_PIN_D7);
-            HumiditySensorController sensorTwo = new HumiditySensorController(N.Pins.GPIO_PIN_A1, N.Pins.GPIO_PIN_D6);
-            HumiditySensorController sensorThree = new HumiditySensorController(N.Pins.GPIO_PIN_A2, N.Pins.GPIO_PIN_D5);
-            bool upload = true;
+            //HumiditySensorController sensorTwo = new HumiditySensorController(N.Pins.GPIO_PIN_A1, N.Pins.GPIO_PIN_D6);
+            //HumiditySensorController sensorThree = new HumiditySensorController(N.Pins.GPIO_PIN_A2, N.Pins.GPIO_PIN_D5);
+
+            //var si7021 = new SI7021(updateInterval: 0);
+            //Debug.Print("Serial number: " + si7021.SerialNumber);
+            //Debug.Print("Firmware revision: " + si7021.FirmwareRevision);
+            //Debug.Print("Sensor type: " + si7021.SensorType);
+
+
+            bool upload = true; 
             while (true)
             {
                 Thread.Sleep(1000);
@@ -65,29 +74,32 @@ namespace SoilMoisture
                 led.Write(true); // turn on the LED
                 //https://maker.ifttt.com/trigger/soil_moisture/with/key/d52lKnzf-xDid_NfD5tga-?value1=120
 
+                //string temp = si7021.Temperature.ToString("f2");
+                //string hum = si7021.Humidity.ToString("f2");
+                //Debug.Print("Temperature: " + temp + ", humidity: " + hum);
                       
                 string sensorOneHumidity = getReading(sensorOne).final.ToString();
                 //Thread.Sleep(500);
 
-                string sensorTwoHumidity = getReading(sensorTwo).final.ToString();
-                //Thread.Sleep(500);
+                string sensorTwoHumidity = "";// getReading(sensorTwo).final.ToString();
+                ////Thread.Sleep(500);
 
-                string sensorThreeHumidity = getReading(sensorThree).final.ToString();
+                string sensorThreeHumidity = "";//getReading(sensorThree).final.ToString();
                 //string sensorFourHumidity = getReading(sensorFour);
-                string display = "1:" + sensorOneHumidity + ",2:" + sensorTwoHumidity +",3:" + sensorThreeHumidity;// + ",4:" + sensorFourHumidity;
+                string display = "1:" + sensorOneHumidity;// +",2:" + sensorTwoHumidity + ",3:" + sensorThreeHumidity;// + ",4:" + sensorFourHumidity;
                // string sensorOneHumidity = getReading(sensorOne);
                 //string display = sensorOneHumidity;
                 Debug.Print(display);
-                Display.ClearDisplay();
-                Display.Write(display);
+                //Display.ClearDisplay();
+                //Display.Write(display);
                 if (upload)
                 {
                     try
                     {
                         string requestUri = "http://maker.ifttt.com/trigger/soil_moisture/with/key/d52lKnzf-xDid_NfD5tga-?value1=" + sensorOneHumidity + "&value2=" + sensorTwoHumidity + "&value3=" + sensorThreeHumidity;
                         sleepMS = 1000 * sleepMinutes * 60;
-                        Display.ClearDisplay();
-                        Display.Write(display);
+                        //Display.ClearDisplay();
+                        //Display.Write(display);
                         byte[] buffer;
                         Stream stream;
                         HttpWebResponse response;
@@ -99,7 +111,7 @@ namespace SoilMoisture
                         }
                         if (response.StatusCode == HttpStatusCode.OK)
                         {
-                            Display.Write(", ok (" + uploadTries.ToString() + ")        " + response.Headers["Date"].ToString());
+                            //Display.Write(", ok (" + uploadTries.ToString() + ")        " + response.Headers["Date"].ToString());
                         }
                         else
                         {
@@ -125,7 +137,7 @@ namespace SoilMoisture
                     catch (Exception e)
                     {
                         string msg = e.Message.Length > 0 ? e.Message : e.InnerException.Message;
-                        Display.Write(" Error recording data:" + msg);
+                        //Display.Write(" Error recording data:" + msg);
 
                         Debug.Print(e.Message);
                         Debug.Print(e.StackTrace);
@@ -154,7 +166,7 @@ namespace SoilMoisture
         {
             int humidity = 0;
             int humidityTotal = 0;
-            int reads = 10;
+            int reads = 5;
             for (int i = 0; i < reads; i++)
             {
                 humidity = sensor.Read().raw;

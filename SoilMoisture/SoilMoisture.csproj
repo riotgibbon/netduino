@@ -33,17 +33,25 @@
   </PropertyGroup>
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <ItemGroup>
+    <Compile Include="Enums.cs" />
     <Compile Include="Hd44780Lcd.cs" />
     <Compile Include="HumiditySensorController.cs" />
+    <Compile Include="I2CBus.cs" />
+    <Compile Include="ICommunicationBus.cs" />
     <Compile Include="IGPIPort.cs" />
     <Compile Include="IGPOPort.cs" />
+    <Compile Include="IHumiditySensor.cs" />
     <Compile Include="IntegratedGPO.cs" />
     <Compile Include="IParallelOut.cs" />
+    <Compile Include="ISensor.cs" />
+    <Compile Include="ITemperatureSensor.cs" />
     <Compile Include="ITRIPort.cs" />
     <Compile Include="Mcp23017.cs" />
     <Compile Include="MultiI2C.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="SensorFloatEventArgs.cs" />
+    <Compile Include="SI7021.cs" />
     <Compile Include="Tools.cs" />
   </ItemGroup>
   <ItemGroup>
