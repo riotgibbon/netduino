@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C# Express 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toolbox.NETMF (4.2)", "Toolbox.NETMF (4.2).csproj", "{CBF2AD5F-2168-4605-BFCB-0256D65AD95B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toolbox.NETMF.Hardware (4.2)", "Hardware\Toolbox.NETMF.Hardware (4.2).csproj", "{1315015E-093C-47CE-8185-E77DB6C6050C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toolbox.NETMF.NET (4.2)", "NET\Toolbox.NETMF.NET (4.2).csproj", "{24AADEAF-F98D-47B4-9FE4-3B41910477DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toolbox.NETMF.NET.Integrated (4.2)", "NET\Integrated\Toolbox.NETMF.NET.Integrated (4.2).csproj", "{235C114E-0757-4D8B-9527-359A22B42C6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toolbox.NETMF.Hardware.WiFlyGSX (4.2)", "Hardware\WiFlyGSX\Toolbox.NETMF.Hardware.WiFlyGSX (4.2).csproj", "{071CBEC2-3B89-4ECD-AB87-1120D5FA9034}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toolbox.NETMF.Hardware.Netduino (4.2)", "Hardware\Netduino\Toolbox.NETMF.Hardware.Netduino (4.2).csproj", "{4A22572A-CC3D-455E-A666-D21CA25D2246}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CBF2AD5F-2168-4605-BFCB-0256D65AD95B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBF2AD5F-2168-4605-BFCB-0256D65AD95B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBF2AD5F-2168-4605-BFCB-0256D65AD95B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBF2AD5F-2168-4605-BFCB-0256D65AD95B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1315015E-093C-47CE-8185-E77DB6C6050C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1315015E-093C-47CE-8185-E77DB6C6050C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1315015E-093C-47CE-8185-E77DB6C6050C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{1315015E-093C-47CE-8185-E77DB6C6050C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1315015E-093C-47CE-8185-E77DB6C6050C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1315015E-093C-47CE-8185-E77DB6C6050C}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{24AADEAF-F98D-47B4-9FE4-3B41910477DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24AADEAF-F98D-47B4-9FE4-3B41910477DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24AADEAF-F98D-47B4-9FE4-3B41910477DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24AADEAF-F98D-47B4-9FE4-3B41910477DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{235C114E-0757-4D8B-9527-359A22B42C6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{235C114E-0757-4D8B-9527-359A22B42C6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{235C114E-0757-4D8B-9527-359A22B42C6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{235C114E-0757-4D8B-9527-359A22B42C6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{071CBEC2-3B89-4ECD-AB87-1120D5FA9034}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{071CBEC2-3B89-4ECD-AB87-1120D5FA9034}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{071CBEC2-3B89-4ECD-AB87-1120D5FA9034}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{071CBEC2-3B89-4ECD-AB87-1120D5FA9034}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{071CBEC2-3B89-4ECD-AB87-1120D5FA9034}.Release|Any CPU.Build.0 = Release|Any CPU
+		{071CBEC2-3B89-4ECD-AB87-1120D5FA9034}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{4A22572A-CC3D-455E-A666-D21CA25D2246}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A22572A-CC3D-455E-A666-D21CA25D2246}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A22572A-CC3D-455E-A666-D21CA25D2246}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A22572A-CC3D-455E-A666-D21CA25D2246}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

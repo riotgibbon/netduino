@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C# Express 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adafruit RGB LCD Shield", "Adafruit RGB LCD Shield\Adafruit RGB LCD Shield.csproj", "{4861714E-6A9E-4CAC-9693-7864220AC403}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toolbox.NETMF (4.1)", "..\..\Framework\Toolbox.NETMF (4.1).csproj", "{CBF2AD5F-2168-4605-BFCB-0256D65AD95B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toolbox.NETMF.Hardware (4.1)", "..\..\Framework\Hardware\Toolbox.NETMF.Hardware (4.1).csproj", "{1315015E-093C-47CE-8185-E77DB6C6050C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4861714E-6A9E-4CAC-9693-7864220AC403}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4861714E-6A9E-4CAC-9693-7864220AC403}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4861714E-6A9E-4CAC-9693-7864220AC403}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{4861714E-6A9E-4CAC-9693-7864220AC403}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4861714E-6A9E-4CAC-9693-7864220AC403}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4861714E-6A9E-4CAC-9693-7864220AC403}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{CBF2AD5F-2168-4605-BFCB-0256D65AD95B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBF2AD5F-2168-4605-BFCB-0256D65AD95B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBF2AD5F-2168-4605-BFCB-0256D65AD95B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBF2AD5F-2168-4605-BFCB-0256D65AD95B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1315015E-093C-47CE-8185-E77DB6C6050C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1315015E-093C-47CE-8185-E77DB6C6050C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1315015E-093C-47CE-8185-E77DB6C6050C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1315015E-093C-47CE-8185-E77DB6C6050C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
