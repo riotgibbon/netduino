@@ -33,132 +33,115 @@ namespace SoilMoisture
             //Debug.Print(Microsoft.SPOT.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()[0].GatewayAddress);
 
             int sleepMinutes = 10;
-            int retrySeconds = 10;
             int sleepMS = 0;
-            int uploadTries = 0;
-            int maxTries = 5;
-
-
-            
 
             // Create an output port (a port that can be written to) 
             // and wire it to the onboard LED
             OutputPort led = new OutputPort(Pins.ONBOARD_LED, false);
 
-            //HumiditySensorController sensorFour = new HumiditySensorController(N.Pins.GPIO_PIN_A3, N.Pins.GPIO_PIN_D4);
-            //// The Adafruit LCD Shield uses a MCP23017 IC as multiplex chip
-            //Mcp23017 Mux = new Mcp23017();
-            //// Pins 9 to 15 are connected to the HD44780 LCD
-            //Hd44780Lcd Display = new Hd44780Lcd(
-            //    Data: Mux.CreateParallelOut(9, 4),
-            //    ClockEnablePin: Mux.Pins[13],
-            //    ReadWritePin: Mux.Pins[14],
-            //    RegisterSelectPin: Mux.Pins[15]
-            //);
+
 
             HumiditySensorController sensorOne = new HumiditySensorController(N.Pins.GPIO_PIN_A0, N.Pins.GPIO_PIN_D7);
-            //HumiditySensorController sensorTwo = new HumiditySensorController(N.Pins.GPIO_PIN_A1, N.Pins.GPIO_PIN_D6);
-            //HumiditySensorController sensorThree = new HumiditySensorController(N.Pins.GPIO_PIN_A2, N.Pins.GPIO_PIN_D5);
+            HumiditySensorController sensorTwo = new HumiditySensorController(N.Pins.GPIO_PIN_A1, N.Pins.GPIO_PIN_D6);
+           // HumiditySensorController sensorThree = new HumiditySensorController(N.Pins.GPIO_PIN_A2, N.Pins.GPIO_PIN_D5);
+            bool hasSi7021 = false;
+            SI7021 si7021=null;
+            try
+            {
+                si7021 = new SI7021(updateInterval: 0);
+                Debug.Print("Serial number: " + si7021.SerialNumber);
+                Debug.Print("Firmware revision: " + si7021.FirmwareRevision);
+                Debug.Print("Sensor type: " + si7021.SensorType);
+                hasSi7021 = true;
 
-            //var si7021 = new SI7021(updateInterval: 0);
-            //Debug.Print("Serial number: " + si7021.SerialNumber);
-            //Debug.Print("Firmware revision: " + si7021.FirmwareRevision);
-            //Debug.Print("Sensor type: " + si7021.SensorType);
+            }
+            catch (Exception)
+            {
+                Debug.Print("Cannot find SI7021");
+                hasSi7021 = false;
+            }
 
 
+            
             bool upload = true; 
             while (true)
             {
                 Thread.Sleep(1000);
-                uploadTries++;
+                string temp = "", hum="";
+                
                 led.Write(true); // turn on the LED
                 //https://maker.ifttt.com/trigger/soil_moisture/with/key/d52lKnzf-xDid_NfD5tga-?value1=120
+                if (hasSi7021)
+                {
+                    si7021.Reset();
+                    temp = si7021.Temperature.ToString("f2");
+                    hum = si7021.Humidity.ToString("f2");
+                    Debug.Print("Temperature: " + temp + ", humidity: " + hum);
 
-                //string temp = si7021.Temperature.ToString("f2");
-                //string hum = si7021.Humidity.ToString("f2");
-                //Debug.Print("Temperature: " + temp + ", humidity: " + hum);
-                      
-                string sensorOneHumidity = getReading(sensorOne).final.ToString();
-                //Thread.Sleep(500);
+                }
+                string soil1 = getReading(sensorOne).final.ToString();
+                string soil2 = getReading(sensorTwo).final.ToString();
+                string soil3 = "";// getReading(sensorThree).final.ToString();
 
-                string sensorTwoHumidity = "";// getReading(sensorTwo).final.ToString();
-                ////Thread.Sleep(500);
-
-                string sensorThreeHumidity = "";//getReading(sensorThree).final.ToString();
-                //string sensorFourHumidity = getReading(sensorFour);
-                string display = "1:" + sensorOneHumidity;// +",2:" + sensorTwoHumidity + ",3:" + sensorThreeHumidity;// + ",4:" + sensorFourHumidity;
-               // string sensorOneHumidity = getReading(sensorOne);
-                //string display = sensorOneHumidity;
+                string display = "1:" + soil1 +",2:" + soil2 + ",3:" + soil3;
                 Debug.Print(display);
-                //Display.ClearDisplay();
-                //Display.Write(display);
                 if (upload)
                 {
-                    try
+                    sleepMS = 1000 * sleepMinutes * 60;
+                    if (hasSi7021)
                     {
-                        string requestUri = "http://maker.ifttt.com/trigger/soil_moisture/with/key/d52lKnzf-xDid_NfD5tga-?value1=" + sensorOneHumidity + "&value2=" + sensorTwoHumidity + "&value3=" + sensorThreeHumidity;
-                        sleepMS = 1000 * sleepMinutes * 60;
-                        //Display.ClearDisplay();
-                        //Display.Write(display);
-                        byte[] buffer;
-                        Stream stream;
-                        HttpWebResponse response;
-
-                        using (var request = (HttpWebRequest)WebRequest.Create(requestUri))
-                        {
-                            request.Method = "GET";
-                            response = (HttpWebResponse)request.GetResponse();
-                        }
-                        if (response.StatusCode == HttpStatusCode.OK)
-                        {
-                            //Display.Write(", ok (" + uploadTries.ToString() + ")        " + response.Headers["Date"].ToString());
-                        }
-                        else
-                        {
-                            throw new Exception("Couldn't send message");
-                        }
-
-                        uploadTries = 0;
-
-                        //buffer = new byte[response.ContentLength];
-                        //stream = response.GetResponseStream();
-
-                        //int read;
-                        //using (var ms = new MemoryStream())
-                        //{
-                        //    while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
-                        //    {
-                        //        ms.Write(buffer, 0, read);
-                        //    }
-                        //}
-                        //char[] chars = Encoding.UTF8.GetChars(buffer);
-                        //var text = new string(chars);
+                        sendToIFTT("window_temp_hum", temp, hum);
+                        sendToIFTT("soil_moisture", soil1, soil2, temp + "/" + hum);
                     }
-                    catch (Exception e)
-                    {
-                        string msg = e.Message.Length > 0 ? e.Message : e.InnerException.Message;
-                        //Display.Write(" Error recording data:" + msg);
-
-                        Debug.Print(e.Message);
-                        Debug.Print(e.StackTrace);
-
-                        if (uploadTries < maxTries)
-                            sleepMS = retrySeconds * 1000;
-                        else
-                            uploadTries = 0;
-
-
-                    }
-
-                    led.Write(false); // turn off the LED
+                    else
+                        sendToIFTT("soil_moisture", soil1, soil2);
+                    led.Write(false);
                     Thread.Sleep(sleepMS);
 
-                    //led.Write(true); // turn on the LED
-                    //Thread.Sleep(Humidity); // sleep for 250ms
-                    //led.Write(false); // turn off the LED
-                    //Thread.Sleep(Humidity); // sleep for 250ms
                 }
+                led.Write(false); // turn off the LED
                 Thread.Sleep(500);
+            }
+        }
+
+        private static void sendToIFTT( string ifftMetric, string value1, string value2, string value3="")
+        {
+            int retrySeconds = 5;
+            int uploadTries = 0;
+            int maxTries = 5;
+            while (uploadTries < maxTries)
+            {
+                try
+                {
+                    string requestUri = "http://maker.ifttt.com/trigger/" + ifftMetric + "/with/key/d52lKnzf-xDid_NfD5tga-?value1=" + value1 + "&value2=" + value2 + "&value3=" + value3;
+                    HttpWebResponse response;
+
+                    using (var request = (HttpWebRequest)WebRequest.Create(requestUri))
+                    {
+                        request.Method = "GET";
+                        response = (HttpWebResponse)request.GetResponse();
+                    }
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        Debug.Print("Uploaded " + ifftMetric + ": value1=" + value1 + "&value2=" + value2 + "&value3=" + value3);
+                        break;
+                        //Display.Write(", ok (" + uploadTries.ToString() + ")        " + response.Headers["Date"].ToString());
+                    }
+                    else
+                    {
+                        throw new Exception("Couldn't send message");
+                    }
+                }
+                catch (Exception e)
+                {
+                    string msg = e.Message.Length > 0 ? e.Message : e.InnerException.Message;
+                    Debug.Print(e.Message);
+                    Debug.Print(e.StackTrace);
+                    uploadTries++;
+                    Thread.Sleep(retrySeconds * 1000);
+
+                }
+
             }
         }
 
