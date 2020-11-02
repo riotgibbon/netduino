@@ -25,5 +25,5 @@ powerVoltage = 5.0;
 sensorVoltage = sensorValue/1024*5.0;
 uvIndex = sensorVoltage / 0.1;
 
-
-![image](https://raw.githubusercontent.com/riotgibbon/netduino/master/AdaFruit-GUVA-S12SD/docs/UV_index.png)
+           
+![image](https://raw.githubusercontent.com/riotgibbon/netduino/main/AdaFruit-GUVA-S12SD/AdaFruit-GUVA-S12SD/docs/UV_index.png)
