@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <AssemblyName>SoilMoisture</AssemblyName>
+    <AssemblyName>AdaFruit-GUVA-S12SD</AssemblyName>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SoilMoisture</RootNamespace>
+    <RootNamespace>AdaFruit_GUVA_S12SD</RootNamespace>
     <ProjectTypeGuids>{b69e3092-b931-443c-abe7-7e7b65f2a37f};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{8D02B56F-635D-4917-944A-6715DC9C1C24}</ProjectGuid>
+    <ProjectGuid>{41FD941F-71C4-499D-BCDD-E7204112633F}</ProjectGuid>
     <TargetFrameworkVersion>v4.1</TargetFrameworkVersion>
     <NetMfTargetsBaseDir Condition="'$(NetMfTargetsBaseDir)'==''">$(MSBuildExtensionsPath32)\Microsoft\.NET Micro Framework\</NetMfTargetsBaseDir>
     <DeployDevice>NetduinoPlus</DeployDevice>
@@ -33,26 +33,9 @@
   </PropertyGroup>
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <ItemGroup>
-    <Compile Include="Enums.cs" />
     <Compile Include="GUVAS12SD.cs" />
-    <Compile Include="HumiditySensorController.cs" />
-    <Compile Include="I2CBus.cs" />
-    <Compile Include="ICommunicationBus.cs" />
-    <Compile Include="IGPIPort.cs" />
-    <Compile Include="IGPOPort.cs" />
-    <Compile Include="IHumiditySensor.cs" />
-    <Compile Include="IntegratedGPO.cs" />
-    <Compile Include="IParallelOut.cs" />
-    <Compile Include="ISensor.cs" />
-    <Compile Include="ITemperatureSensor.cs" />
-    <Compile Include="ITRIPort.cs" />
-    <Compile Include="MultiI2C.cs" />
-    <Compile Include="NetduinoMQTT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="SensorFloatEventArgs.cs" />
-    <Compile Include="SI7021.cs" />
-    <Compile Include="Tools.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SPOT.Hardware" />
@@ -63,7 +46,5 @@
     <Reference Include="SecretLabs.NETMF.Hardware" />
     <Reference Include="SecretLabs.NETMF.Hardware.NetduinoPlus" />
     <Reference Include="System" />
-    <Reference Include="System.Http" />
-    <Reference Include="System.IO" />
   </ItemGroup>
 </Project>

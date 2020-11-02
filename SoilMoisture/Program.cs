@@ -15,6 +15,8 @@ using System.Text;
 using Microsoft.SPOT.Net.NetworkInformation;
 using Toolbox.NETMF.Hardware;
 using Netduino.Foundation.Sensors.Atmospheric;
+using Netduino_MQTT_Client_Library;
+using AdaFruit_GUVA_S12SD;
 
 namespace SoilMoisture
 {
@@ -24,26 +26,18 @@ namespace SoilMoisture
 
         public static void Main()
         {
-            //Debug.Print(Microsoft.SPOT.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()[0].GatewayAddress);
-            //Microsoft.SPOT.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()[0].EnableDhcp();
+            int ifttIntervalMinutes = 10;
+            int mqttIntervalSeconds = 5;
 
-            //var interf = NetworkInterface.GetAllNetworkInterfaces()[0];
-            //interf.EnableStaticIP("192.168.0.55", "255.255.255.0", "192.168.0.1");
-            ////interf.EnableStaticDns(new string[] { <settings.primaryDNSAddress>, <settings.secondaryDNSAddress> });
-            //Debug.Print(Microsoft.SPOT.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()[0].GatewayAddress);
-
-            int sleepMinutes = 10;
             int sleepMS = 0;
 
             // Create an output port (a port that can be written to) 
             // and wire it to the onboard LED
             OutputPort led = new OutputPort(Pins.ONBOARD_LED, false);
 
-
-
             HumiditySensorController sensorOne = new HumiditySensorController(N.Pins.GPIO_PIN_A0, N.Pins.GPIO_PIN_D7);
             HumiditySensorController sensorTwo = new HumiditySensorController(N.Pins.GPIO_PIN_A1, N.Pins.GPIO_PIN_D6);
-           // HumiditySensorController sensorThree = new HumiditySensorController(N.Pins.GPIO_PIN_A2, N.Pins.GPIO_PIN_D5);
+            HumiditySensorController sensorThree = new HumiditySensorController(N.Pins.GPIO_PIN_A2, N.Pins.GPIO_PIN_D5);
             bool hasSi7021 = false;
             SI7021 si7021=null;
             try
@@ -61,50 +55,131 @@ namespace SoilMoisture
                 hasSi7021 = false;
             }
 
+            var lightSensor = new GUVAS12SD(N.Pins.GPIO_PIN_A3);
 
-            
-            bool upload = true; 
+            DateTime uploadToIFTTTime = DateTime.Now.AddMinutes(-(ifttIntervalMinutes + 1));
+            DateTime mqttMessageTime = DateTime.Now.AddSeconds(-(mqttIntervalSeconds + 1));
+
             while (true)
             {
                 Thread.Sleep(1000);
-                string temp = "", hum="";
                 
-                led.Write(true); // turn on the LED
-                //https://maker.ifttt.com/trigger/soil_moisture/with/key/d52lKnzf-xDid_NfD5tga-?value1=120
+                string temp = "", hum = "", humAdjusted="";             
                 if (hasSi7021)
                 {
                     si7021.Reset();
                     temp = si7021.Temperature.ToString("f2");
                     hum = si7021.Humidity.ToString("f2");
+                    humAdjusted = (si7021.Humidity / 2).ToString("f2");
                     Debug.Print("Temperature: " + temp + ", humidity: " + hum);
-
                 }
                 string soil1 = getReading(sensorOne).final.ToString();
                 string soil2 = getReading(sensorTwo).final.ToString();
-                string soil3 = "";// getReading(sensorThree).final.ToString();
+                string soil3 = getReading(sensorThree).final.ToString();
 
-                string display = "1:" + soil1 +",2:" + soil2 + ",3:" + soil3;
-                Debug.Print(display);
-                if (upload)
+                var lightValue = lightSensor.Read();
+               // string lightValue.sensorReading + " = " + lightValue.sensorVoltage + "v, UV: " + lightValue.uvIndex
+  
+                string csvDelim = "|";
+                string csv = soil1 + csvDelim + soil2 + csvDelim + soil3 + csvDelim + temp + csvDelim + hum + csvDelim + humAdjusted
+                    + csvDelim + lightValue.sensorReading + csvDelim + lightValue.sensorVoltage + csvDelim + lightValue.uvIndex;
+
+                Debug.Print(csv);
+
+                if (DateTime.Now > uploadToIFTTTime)
                 {
-                    sleepMS = 1000 * sleepMinutes * 60;
-                    if (hasSi7021)
+                    led.Write(true); // turn on the LED
+                    try
                     {
-                        sendToIFTT("window_temp_hum", temp, hum);
-                        sendToIFTT("soil_moisture", soil1, soil2, temp + "/" + hum);
+                    sleepMS = 1000 * ifttIntervalMinutes * 60;
+                    sendToIFTT("living_room_window", csv);
+
+                    //led.Write(false);
+                    uploadToIFTTTime = DateTime.Now.AddMinutes(ifttIntervalMinutes);
+                    Debug.Print("Next upload to IFFT: " + uploadToIFTTTime);
+
                     }
-                    else
-                        sendToIFTT("soil_moisture", soil1, soil2);
+                    catch (Exception)
+                    {
+                        Debug.Print("Upload batch to IFTTT failed");
+                    }
                     led.Write(false);
-                    Thread.Sleep(sleepMS);
 
                 }
-                led.Write(false); // turn off the LED
+                if (DateTime.Now > mqttMessageTime)
+                {
+                    led.Write(true); // turn on the LED
+                    try
+                    {
+                        
+                        IPHostEntry hostEntry = Dns.GetHostEntry("192.168.0.63");
+                        // Create socket and connect to the broker's IP address and port
+                        var mySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                        try
+                        {
+                            mySocket.Connect(new IPEndPoint(hostEntry.AddressList[0], 1883));
+                        }
+                        catch (SocketException SE)
+                        {
+                            Debug.Print("Connection Error: " + SE.ErrorCode);
+                            throw (SE);
+                        }
+
+                        int returnCode = NetduinoMQTT.ConnectMQTT(mySocket, "netduinoPlus", 500, true);
+                        if (returnCode != 0)
+                        {
+                            var error = "Connection Error: " + returnCode.ToString();
+                            Debug.Print(error);
+                            throw new InvalidOperationException(error);
+                        }
+
+
+                        string windowLocation = "window";
+                        if (hasSi7021)
+                        {
+                            
+                            NetduinoMQTT.PublishMQTT(mySocket, buildMqttTopic(windowLocation, "temperature"), temp);
+                            NetduinoMQTT.PublishMQTT(mySocket, buildMqttTopic(windowLocation,   "humidity"), hum); 
+                            NetduinoMQTT.PublishMQTT(mySocket, buildMqttTopic(windowLocation,  "humidityAdjusted"), humAdjusted);
+                        }
+                        //lightValue.sensorReading + csvDelim + lightValue.sensorVoltage + csvDelim + lightValue.uvIndex
+                        NetduinoMQTT.PublishMQTT(mySocket, buildMqttTopic(windowLocation, "lightReading"), lightValue.sensorReading.ToString());
+                        NetduinoMQTT.PublishMQTT(mySocket, buildMqttTopic(windowLocation, "lightVoltage"), lightValue.sensorVoltage.ToString());
+                        NetduinoMQTT.PublishMQTT(mySocket, buildMqttTopic(windowLocation, "uvIndex"), lightValue.uvIndex.ToString());
+
+                        var metric = "soilmoisture";
+                        NetduinoMQTT.PublishMQTT(mySocket, buildMqttTopic("aralia", metric), soil1);
+                        NetduinoMQTT.PublishMQTT(mySocket, buildMqttTopic("bonsai",metric), soil2);
+                        NetduinoMQTT.PublishMQTT(mySocket,buildMqttTopic( "amaryllis",metric), soil3);
+
+
+
+                        mqttMessageTime = DateTime.Now.AddSeconds(mqttIntervalSeconds);
+                        Debug.Print("Next MQTT messaging: " + mqttMessageTime);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Print("MQTT failed" + e.InnerException.Message);
+                            
+                    }
+
+                    led.Write(false); // turn off the LED
+                }
+                
                 Thread.Sleep(500);
             }
         }
 
-        private static void sendToIFTT( string ifftMetric, string value1, string value2, string value3="")
+        static string buildMqttTopic(string device, string metric)
+        {
+            string mqttTopicRoot = "home/tele/";
+            string room = "livingroom";
+            string topic = mqttTopicRoot + metric + "/" + room + "/" + device;
+            return topic;
+
+        }
+
+        private static void sendToIFTT( string ifftMetric, string value1, string value2="", string value3="")
         {
             int retrySeconds = 5;
             int uploadTries = 0;
@@ -138,10 +213,9 @@ namespace SoilMoisture
                     Debug.Print(e.Message);
                     Debug.Print(e.StackTrace);
                     uploadTries++;
-                    Thread.Sleep(retrySeconds * 1000);
-
+                    
                 }
-
+                Thread.Sleep(retrySeconds * 1000);
             }
         }
 
